@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pipeline Controller</title>
+    <title>Secure Pipeline Controller</title>
 </head>
 <body>
-    <h1>GitHub Actions Controls</h1>
+    <h1>Secure GitHub Actions Controls</h1>
+    
+    <!-- Security Input Block -->
+    <label for="uiPassword">Secret Passphrase:</label><br>
+    <input type="password" id="uiPassword" placeholder="Enter password to authenticate"><br><br>
+
+    <label for="customInput">Enter Custom Data:</label><br>
+    <input type="text" id="customInput" placeholder="e.g., Build version, release notes"><br><br>
+
     <button id="runBtn" onclick="sendTrigger()">Launch Deployment</button>
     <p id="status"></p>
 
@@ -13,20 +21,36 @@
         async function sendTrigger() {
             const statusEl = document.getElementById("status");
             const btn = document.getElementById("runBtn");
+            const inputVal = document.getElementById("customInput").value;
+            const passwordVal = document.getElementById("uiPassword").value;
             
-            statusEl.innerText = "Triggering pipeline...";
+            if (!passwordVal) {
+                statusEl.innerText = "Authentication password is required.";
+                return;
+            }
+            if (!inputVal.trim()) {
+                statusEl.innerText = "Please enter some data first.";
+                return;
+            }
+
+            statusEl.innerText = "Authenticating and triggering pipeline...";
             btn.disabled = true;
 
             try {
-                // Netlify automatically hosts functions relative to your site path
                 const response = await fetch("/.netlify/functions/trigger-workflow", {
-                    method: "POST"
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        password: passwordVal, // Send the password attempt
+                        message: inputVal 
+                    })
                 });
                 
                 const result = await response.json();
                 
                 if (response.ok) {
-                    statusEl.innerText = "Success! Action is running.";
+                    statusEl.innerText = "Success! Action is running with your input.";
+                    document.getElementById("uiPassword").value = ""; // Clear password field
                 } else {
                     statusEl.innerText = `Failed: ${result.error || 'Unknown error'}`;
                 }
