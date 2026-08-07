@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pipeline Controller</title>
+</head>
+<body>
+    <h1>GitHub Actions Controls</h1>
+    <button id="runBtn" onclick="sendTrigger()">Launch Deployment</button>
+    <p id="status"></p>
+
+    <script>
+        async function sendTrigger() {
+            const statusEl = document.getElementById("status");
+            const btn = document.getElementById("runBtn");
+            
+            statusEl.innerText = "Triggering pipeline...";
+            btn.disabled = true;
+
+            try {
+                // Netlify automatically hosts functions relative to your site path
+                const response = await fetch("/.netlify/functions/trigger-workflow", {
+                    method: "POST"
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusEl.innerText = "Success! Action is running.";
+                } else {
+                    statusEl.innerText = `Failed: ${result.error || 'Unknown error'}`;
+                }
+            } catch (err) {
+                statusEl.innerText = "Error reaching the serverless function.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

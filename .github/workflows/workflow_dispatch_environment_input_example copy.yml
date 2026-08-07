@@ -7,7 +7,11 @@ on:
                 description: "The environment to deploy to"
                 required: true
                 type: environment
-
+            notify:
+                    description: "Notify the team when deploying"
+                    required: false
+                    default: false
+                    type: boolean
 
 jobs:
     deploy:
