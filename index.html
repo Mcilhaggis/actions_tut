@@ -11,8 +11,25 @@
     <label for="uiPassword">Secret Passphrase:</label><br>
     <input type="password" id="uiPassword" placeholder="Enter password to authenticate"><br><br>
 
-    <label for="customInput">Enter Custom Data:</label><br>
-    <input type="text" id="customInput" placeholder="e.g., Build version, release notes"><br><br>
+    <label for="customInput">Enter Course Code:</label><br>
+    <!-- Use the formatting of the course code to detect if it's Elementary or Secondary -->
+    <input type="text" id="customInput" placeholder="e.g., MTH1W, FRA1D, ELWM7"><br><br>
+    
+    <!-- Update later to get the branches available and if none default to master -->
+    <label for="versionInput">Enter Version Code:</label><br>
+    <input type="text" id="versionInput" placeholder="e.g., MTH1W-EN-01-0126-(I-A), FRA2D-EN-01-0126-(M-D)"><br><br>
+
+    <label>Confirm Language: </label>
+    <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="fr">French</option>
+    </select><br><br>
+
+    <label for="selectStream">Select Stream:</label><br>
+    <select id="selectStream">
+        <option value="stream1">MOE</option>
+        <option value="stream2">ILC</option>
+    </select><br><br>
 
     <button id="runBtn" onclick="sendTrigger()">Launch Deployment</button>
     <p id="status"></p>
@@ -22,6 +39,10 @@
             const statusEl = document.getElementById("status");
             const btn = document.getElementById("runBtn");
             const inputVal = document.getElementById("customInput").value;
+            const versionVal = document.getElementById("versionInput").value;
+            const languageVal = document.getElementById("languageSelect").value;
+            const streamVal = document.getElementById("selectStream").value;
+
             const passwordVal = document.getElementById("uiPassword").value;
             
             if (!passwordVal) {
