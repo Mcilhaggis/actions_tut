@@ -10,7 +10,6 @@ export async function handler(event, context) {
   // Retrieve secrets from Netlify Configuration variables
   const UI_ACCESS_PASSWORD = process.env.UI_ACCESS_PASSWORD;
   const GITHUB_TOKEN = process.env.GITHUB_PAT_TOKEN;
-
   // 1. Validate Password First
   if (!userPasswordAttempt || userPasswordAttempt !== UI_ACCESS_PASSWORD) {
     return {
@@ -19,9 +18,9 @@ export async function handler(event, context) {
     };
   }
 
-  const OWNER = "your-github-username-or-org";
-  const REPO = "your-repo-name";
-  const WORKFLOW = "manual-trigger.yml"; 
+  const OWNER = "Mcilhaggis";
+  const REPO = "actions_tut";
+  const WORKFLOW = "workflow_dispatch_manual_trigger.yml"; 
 
   // 2. Proceed to GitHub Action Trigger if authentication succeeds
   try {

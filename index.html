@@ -2,12 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Secure Pipeline Controller</title>
+    <title>Asset Compliance Tool</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Secure GitHub Actions Controls</h1>
-    
-    <!-- Security Input Block -->
+    <div class="page">
+        <div class="theme-switcher">
+            <span>Theme:</span>
+            <button id="themeToggle" type="button" onclick="toggleTheme()">Switch to light</button>
+        </div>
+        <div class="card">
+            <h1>Asset Compliance Tool</h1>
+            <p class="intro">Use this tool to compare course assets against copyright records and identify anomalies, missing content, and generate a report of asset ownership.</p>
+            <!-- Security Input Block -->
     <label for="uiPassword">Secret Passphrase:</label><br>
     <input type="password" id="uiPassword" placeholder="Enter password to authenticate"><br><br>
 
@@ -21,18 +28,22 @@
 
     <label>Confirm Language: </label>
     <select id="languageSelect">
+        <option value="">--Select Language--</option>
         <option value="en">English</option>
         <option value="fr">French</option>
     </select><br><br>
 
     <label for="selectStream">Select Stream:</label><br>
     <select id="selectStream">
+        <option value="">--Select Stream--</option>
         <option value="stream1">MOE</option>
         <option value="stream2">ILC</option>
     </select><br><br>
 
-    <button id="runBtn" onclick="sendTrigger()">Launch Deployment</button>
+    <button id="runBtn" onclick="sendTrigger()">Run Reports and Comparison</button>
     <p id="status"></p>
+        </div>
+    </div>
 
     <script>
         async function sendTrigger() {
@@ -53,6 +64,18 @@
                 statusEl.innerText = "Please enter some data first.";
                 return;
             }
+            if(!versionVal.trim()) {
+                statusEl.innerText = "Please enter a version code.";
+                return;
+            }
+            if(!languageVal) {
+                statusEl.innerText = "Please select a language.";
+                return;
+            }
+            if(!streamVal) {
+                statusEl.innerText = "Please select a stream.";
+                return;
+            }
 
             statusEl.innerText = "Authenticating and triggering pipeline...";
             btn.disabled = true;
@@ -63,7 +86,10 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
                         password: passwordVal, // Send the password attempt
-                        message: inputVal 
+                        message: inputVal,
+                        version: versionVal,
+                        language: languageVal,
+                        stream: streamVal
                     })
                 });
                 
@@ -81,6 +107,22 @@
                 btn.disabled = false;
             }
         }
+
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            const isLight = body.classList.toggle('light-theme');
+            toggle.innerText = isLight ? 'Switch to dark' : 'Switch to light';
+            localStorage.setItem('uiTheme', isLight ? 'light' : 'dark');
+        }
+
+        (function initializeTheme() {
+            const saved = localStorage.getItem('uiTheme');
+            if (saved === 'light') {
+                document.body.classList.add('light-theme');
+                document.getElementById('themeToggle').innerText = 'Switch to dark';
+            }
+        })();
     </script>
 </body>
 </html>
