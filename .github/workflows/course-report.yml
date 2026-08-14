@@ -41,13 +41,13 @@ jobs:
           
       - name: Encode Repo
         run: |
-          python3 -c "import urllib.parse print(urllib.parse.quote('${{ inputs.repo }}', safe=''))"
+          python3 -c "import urllib.parse; print(urllib.parse.quote('${{ inputs.repo }}', safe=''))"
 
       - name: Download GitLab Repository
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          ENCODED_REPO=$(python3 -c "import urllib.parse print(urllib.parse.quote('${{ inputs.repo }}', safe=''))")
+          ENCODED_REPO=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${{ inputs.repo }}', safe=''))")
 
           echo "Encoded Repo:"
           echo $ENCODED_REPO
