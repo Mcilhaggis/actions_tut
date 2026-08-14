@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <div class="page">
         <div class="theme-switcher">
             <span>Theme:</span>
@@ -15,67 +16,64 @@
             <h1>Asset Compliance Tool</h1>
             <p class="intro">Use this tool to compare course assets against copyright records and identify anomalies, missing content, and generate a report of asset ownership.</p>
             <!-- Security Input Block -->
-    <label for="uiPassword">Secret Passphrase: Testing</label><br>
+    <label for="uiPassword">Secret Passphrase:</label><br>
     <input type="password" id="uiPassword" placeholder="Enter password to authenticate"><br><br>
 
     <label for="customInput">Enter Course Code:</label><br>
 
         
     <p style="color: red"> To Code: Use the formatting of the course code to detect if it's Elementary or Secondary </p>
-    <input type="text" id="customInput" placeholder="e.g., MTH1W, FRA1D, ELWM7"><br><br>
-    
-    <p style="color: red"> to Code: Update later to get the branches available and if none default to master</p>
-    <label for="versionInput">Enter Version Code:</label><br>
-    <input type="text" id="versionInput" placeholder="e.g., MTH1W-EN-01-0126-(I-A), FRA2D-EN-01-0126-(M-D)"><br><br>
+    <input type="text" id="customInput" placeholder="e.g., MTH1W, FRA1D, ELWM7" oninput="validateCourseCode()"><br><br>
+    <p id="courseValidation"></p>
 
-    <label>Confirm Language: </label>
+    <label for="selectStream">Select Stream:</label><br>
+    <select id="selectStream" disabled onchange="validateStreamType()">
+        <option value="">--Select Stream--</option>
+        <option value="MOE">MOE</option>
+        <option value="ILC">ILC</option>
+    </select><br><br>
+    
+    <label for="branchSelect">Select Branch:</label><br>
+    <select id="branchSelect" disabled onchange="validateBranchSelection()">
+        <option value="">--Loading Branches--</option>
+    </select>
+    <br><br>
+
+<!--<label>Confirm Language: </label>
     <select id="languageSelect">
         <option value="">--Select Language--</option>
         <option value="en">English</option>
         <option value="fr">French</option>
-    </select><br><br>
-
-    <label for="selectStream">Select Stream:</label><br>
-    <select id="selectStream">
-        <option value="">--Select Stream--</option>
-        <option value="stream1">MOE</option>
-        <option value="stream2">ILC</option>
-    </select><br><br>
+    </select><br><br> -->
 
     <button id="runBtn" onclick="sendTrigger()">Run Reports and Comparison</button>
-    <p id="status"></p>
+    <p id="statusEl"></p>
         </div>
     </div>
 
     <script>
         async function sendTrigger() {
-            const statusEl = document.getElementById("status");
+            //const passwordVal = document.getElementById("uiPassword").value;
+            const statusEl = document.getElementById("statusEl");
             const btn = document.getElementById("runBtn");
-            const inputVal = document.getElementById("customInput").value;
-            const versionVal = document.getElementById("versionInput").value;
-            const languageVal = document.getElementById("languageSelect").value;
-            const streamVal = document.getElementById("selectStream").value;
-
-            const passwordVal = document.getElementById("uiPassword").value;
             
-            if (!passwordVal) {
-                statusEl.innerText = "Authentication password is required.";
-                return;
-            }
-            if (!inputVal.trim()) {
+            // if (!passwordVal) {
+            //     statusEl.innerText = "Authentication password is required.";
+            //     return;
+            // }
+
+            if (!courseInfo.courseCode) {
                 statusEl.innerText = "Please enter some data first.";
                 return;
             }
-            if(!versionVal.trim()) {
-                statusEl.innerText = "Please enter a version code.";
-                return;
-            }
-            if(!languageVal) {
-                statusEl.innerText = "Please select a language.";
-                return;
-            }
-            if(!streamVal) {
+
+            if (courseInfo.courseType === "Secondary" && !courseInfo.streamType) {
                 statusEl.innerText = "Please select a stream.";
+                return;
+            }
+
+            if(!courseInfo.branch) {
+                statusEl.innerText = "Please select a branch.";
                 return;
             }
 
@@ -87,11 +85,12 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
-                        password: passwordVal, // Send the password attempt
-                        message: inputVal,
-                        version: versionVal,
-                        language: languageVal,
-                        stream: streamVal
+                        // password: passwordVal, // Send the password attempt
+                        message: courseInfo.courseCode,
+                        version: courseInfo.courseType,
+                        language: courseInfo.streamType,
+                        stream: courseInfo.repo,
+                        branch: courseInfo.branch
                     })
                 });
                 
@@ -125,6 +124,156 @@
                 document.getElementById('themeToggle').innerText = 'Switch to dark';
             }
         })();
+
+        const courseInfo = {
+            courseCode: "",
+            courseType: "",
+            streamType: "",
+            repo: "",
+            branch: ""
+        };
+
+        function validateCourseCode() {
+            const input = document.getElementById("customInput").value.trim().toUpperCase();
+
+            const streamDropdown = document.getElementById("selectStream");
+            const validationMessage = document.getElementById("courseValidation");
+
+            let isValid = false;
+            courseInfo.courseType = "";
+            courseInfo.streamType = "";
+            courseInfo.branch = "";
+
+            const kindergartenRegex = /^[A-Z]{4}$/;
+            const elementaryRegex = /^[A-Z]{4}[0-9]$/;
+            const secondaryRegex = /^[A-Z]{3}[0-9][A-Z]$/;
+
+            if (secondaryRegex.test(input)) {
+                isValid = true;
+                courseInfo.courseType = "Secondary";
+            }
+            else if (elementaryRegex.test(input)) {
+                isValid = true;
+                courseInfo.courseType = "Elementary";
+            }
+            else if (kindergartenRegex.test(input)) {
+                isValid = true;
+                courseInfo.courseType = "Kindergarten";
+            }
+
+            if (isValid) {
+                validationMessage.style.color = "green";
+                validationMessage.innerText = `Valid ${courseInfo.courseType} Course`;
+                courseInfo.courseCode = input;
+
+                if (courseInfo.courseType == "Secondary") {
+                    streamDropdown.disabled = false;
+                }
+                else
+                {
+                    streamDropdown.disabled = true;
+                    buildRepoPath();
+                }
+
+            } else {
+                validationMessage.style.color = "red";
+                validationMessage.innerText = "Invalid Course Format";
+                streamDropdown.disabled = true;
+                streamDropdown.value = "";
+            }
+        }
+
+        function validateStreamType() {
+            const streamDropdown = document.getElementById("selectStream");
+            courseInfo.streamType = streamDropdown.value;
+
+            buildRepoPath();
+        }
+
+        function buildRepoPath() {
+            let repo = `tvontario/digital-learning-projects/ilcdcc/${courseInfo.courseCode.toLowerCase()}_html`;
+
+            if (courseInfo.streamType === "MOE") {
+                repo += "_ministry";
+            }
+
+            courseInfo.repo = repo;
+            console.log(courseInfo);
+
+            getBranches();
+        }
+
+        async function getBranches() {
+
+            try {
+                const response = await fetch(
+                    "/.netlify/functions/get-branches",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({repo: courseInfo.repo})
+                    }
+                );
+
+                const text = await response.text();
+
+                console.log(text);
+
+                if (!response.ok) {
+                    throw new Error(text);
+                }
+
+                const branches = JSON.parse(text);
+
+                populateBranchDropdown(branches);
+            }
+            catch (err) {
+
+                console.error(
+                    "Failed loading branches",
+                    err
+                );
+
+            }
+        }
+
+        function populateBranchDropdown(branches) {
+
+            const dropdown = document.getElementById("branchSelect");
+
+            dropdown.innerHTML = '<option value="">--Select Branch--</option>';
+
+            branches.forEach(branch => {
+
+                const option = document.createElement("option");
+
+                option.value = branch.name;
+                option.textContent = branch.name;
+
+                dropdown.appendChild(option);
+            });
+
+            dropdown.disabled = false;
+        }
+
+        function validateBranchSelection() {
+
+            const branchDropdown =
+                document.getElementById("branchSelect");
+
+            courseInfo.branch =
+                branchDropdown.value;
+
+            console.log(
+                "Selected Branch:",
+                courseInfo.branch
+            );
+
+            console.log(courseInfo);
+        }
+
     </script>
 </body>
 </html>

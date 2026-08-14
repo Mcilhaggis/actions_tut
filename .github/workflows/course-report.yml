@@ -1,0 +1,40 @@
+name: Course Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      courseCode:
+        required: true
+        type: string
+
+      courseType:
+        required: true
+        type: string
+
+      streamType:
+        required: true
+        type: string
+
+      repo:
+        required: true
+        type: string
+
+      branch:
+        required: true
+        type: string
+
+jobs:
+
+  debug:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Show Inputs
+        run: |
+          echo "Course Code: ${{ inputs.courseCode }}"
+          echo "Course Type: ${{ inputs.courseType }}"
+          echo "Stream Type: ${{ inputs.streamType }}"
+          echo "Repo: ${{ inputs.repo }}"
+          echo "Branch: ${{ inputs.branch }}"
