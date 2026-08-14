@@ -39,7 +39,6 @@ jobs:
           echo "Repo: ${{ inputs.repo }}"
           echo "Branch: ${{ inputs.branch }}"
           
-          - name: Download GitLab Repository
       - name: Download GitLab Repository
         run: | 
           echo "Downloading Repo..."
