@@ -61,26 +61,14 @@ jobs:
       - name: Verify Download
         run: |
           ls -lh
-      - name: Download GitLab Repository
-        run: | 
-          echo "Downloading:"
-          echo "${{ inputs.repo }}"
-          echo "${{ inputs.branch }}"
 
       - name: Extract Repository
         run: |
-          echo "Extracting Repo..."
+          mkdir tempDir
+          unzip repo.zip -d tempDir
+          echo "Extraction complete"
+          ls -lah tempDir
           
       - name: Run Course Report
         run: |
           echo "Running Course Report..."
-
-          jobs:
-
-
-      - name: Show Inputs
-        run: |
-          echo "Course Code: ${{ inputs.courseCode }}"
-          echo "Repo: ${{ inputs.repo }}"
-          echo "Branch: ${{ inputs.branch }}"
-
