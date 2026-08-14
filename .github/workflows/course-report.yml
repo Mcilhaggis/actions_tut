@@ -39,9 +39,33 @@ jobs:
           echo "Repo: ${{ inputs.repo }}"
           echo "Branch: ${{ inputs.branch }}"
           
+      - name: Encode Repo
+        run: |
+          python3 -c "import urllib.parse print(urllib.parse.quote('${{ inputs.repo }}', safe=''))"
+
+      - name: Download GitLab Repository
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          ENCODED_REPO=$(python3 -c "import urllib.parse print(urllib.parse.quote('${{ inputs.repo }}', safe=''))")
+
+          echo "Encoded Repo:"
+          echo $ENCODED_REPO
+
+          curl \
+            --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+            -L \
+            "https://gitlab.com/api/v4/projects/$ENCODED_REPO/repository/archive.zip?sha=${{ inputs.branch }}" \
+            -o repo.zip
+
+      - name: Verify Download
+        run: |
+          ls -lh
       - name: Download GitLab Repository
         run: | 
-          echo "Downloading Repo..."
+          echo "Downloading:"
+          echo "${{ inputs.repo }}"
+          echo "${{ inputs.branch }}"
 
       - name: Extract Repository
         run: |
@@ -50,3 +74,13 @@ jobs:
       - name: Run Course Report
         run: |
           echo "Running Course Report..."
+
+          jobs:
+
+
+      - name: Show Inputs
+        run: |
+          echo "Course Code: ${{ inputs.courseCode }}"
+          echo "Repo: ${{ inputs.repo }}"
+          echo "Branch: ${{ inputs.branch }}"
+
