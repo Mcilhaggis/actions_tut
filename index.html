@@ -84,12 +84,11 @@
                 const response = await fetch("/.netlify/functions/trigger-workflow", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        // password: passwordVal, // Send the password attempt
-                        message: courseInfo.courseCode,
-                        version: courseInfo.courseType,
-                        language: courseInfo.streamType,
-                        stream: courseInfo.repo,
+                    body: JSON.stringify({
+                        courseCode: courseInfo.courseCode,
+                        courseType: courseInfo.courseType,
+                        streamType: courseInfo.streamType,
+                        repo: courseInfo.repo,
                         branch: courseInfo.branch
                     })
                 });

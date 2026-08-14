@@ -15,11 +15,28 @@ exports.handler = async function(event) {
         branch
     } = JSON.parse(event.body);
 
-    const GITHUB_TOKEN =
-        process.env.GITHUB_PAT_TOKEN;
+    const GITHUB_TOKEN = process.env.GITHUB_PAT_TOKEN;
+
+    // const workflowCheck = await fetch(
+    //     "https://api.github.com/repos/Mcilhaggis/actions_tut/actions/workflows",
+    //     {
+    //         headers: {
+    //             "Authorization": `Bearer ${GITHUB_TOKEN}`,
+    //             "Accept": "application/vnd.github+json"
+    //         }
+    //     }
+    // );
+
+    // const workflowText = await workflowCheck.text();
+    // console.log("Workflow List:", workflowText);
 
     try {
-
+                console.log(
+                        courseCode,
+                        courseType,
+                        streamType,
+                        repo,
+                        branch);
         const response = await fetch(
             "https://api.github.com/repos/Mcilhaggis/actions_tut/actions/workflows/course-report.yml/dispatches",
             {
@@ -40,10 +57,17 @@ exports.handler = async function(event) {
                         branch
                     }
                 })
+
+
             }
         );
 
+console.log("Dispatch Status:", response.status);
 
+const responseText = await response.text();
+
+console.log("Dispatch Response:");
+console.log(responseText);
         
         if (response.status !== 204) {
 
