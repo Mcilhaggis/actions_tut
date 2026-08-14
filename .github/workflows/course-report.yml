@@ -38,3 +38,16 @@ jobs:
           echo "Stream Type: ${{ inputs.streamType }}"
           echo "Repo: ${{ inputs.repo }}"
           echo "Branch: ${{ inputs.branch }}"
+          
+          - name: Download GitLab Repository
+      - name: Download GitLab Repository
+        run: | 
+          echo "Downloading Repo..."
+
+      - name: Extract Repository
+        run: |
+          echo "Extracting Repo..."
+          
+      - name: Run Course Report
+        run: |
+          echo "Running Course Report..."
